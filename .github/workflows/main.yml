@@ -39,7 +39,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: AtitBimali/argo_infra
-        ref: main # or specify the branch you want
+        ref: master # or specify the branch you want
         token:  ${{ secrets.TOKEN }}
 
     - name: Update Deployment YAML
