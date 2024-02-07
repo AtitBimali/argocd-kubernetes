@@ -1,0 +1,57 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - master 
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: flask_app
+  OTHER_REPO_AUTHOR_NAME: AtitBimali
+  OTHER_REPO_NAME: argo_infra
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Test
+      run: echo "Pipeline dummy test passed!"
+
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push Docker image
+      run: |
+        docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:${{ github.run_number }}
+
+    - name: Push additional image tag
+      run: |
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:${{ github.run_number }}
+
+    - name: Checkout Other Repository
+      uses: actions/checkout@v2
+      with:
+        repository: AtitBimali/argo_infra
+        ref: main # or specify the branch you want
+        token:  ${{ secrets.TOKEN }}
+
+    - name: Update Deployment YAML
+      run: |
+        sed -i 's+${{ secrets.DOCKER_USERNAME }}/test.*+${{ secrets.DOCKER_USERNAME }}/test:${{ github.run_number }}+g' ./dev/deployment.yaml
+    - name: Git add
+      run: |
+        git config --global user.email "atitbimali10@gmail.com"
+        git config --global user.name "AtitBimali"
+        git add .
+        git commit -m "Update deployment.yaml with latest build ${{ github.run_number }}"
+        git push -u origin main
+
+    - name: Logout from Docker Hub
+      run: docker logout
