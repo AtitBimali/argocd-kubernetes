@@ -44,7 +44,7 @@ jobs:
 
     - name: Update Deployment YAML
       run: |
-        sed -i 's+${{ secrets.DOCKER_USERNAME }}/test.*+${{ secrets.DOCKER_USERNAME }}/test:${{ github.run_number }}+g' ./dev/deployment.yaml
+        sed -i 's+${{ secrets.DOCKER_USERNAME }}/flask_app.*+${{ secrets.DOCKER_USERNAME }}/flask_app:${{ github.run_number }}+g' ./dev/deployment.yaml
     - name: Git add
       run: |
         git config --global user.email "atitbimali10@gmail.com"
