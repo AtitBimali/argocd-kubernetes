@@ -1,0 +1,1 @@
+Push event to this repo pushes the docker image to Dockher Hub and updates the image name on the [Argo Infra](https://github.com/AtitBimali/argo_infra) repo according to the recent github action run number.
